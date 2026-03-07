@@ -33,14 +33,16 @@ router.post('/users/login', async (req, res) => {
     }
 })
 
-router.get('/users', auth, async (req, res) => {
+router.get('/users/me', auth, async (req, res) => {
 
-    try {
-        const users = await User.find({});
-        res.send(users);
-    } catch (e) {
-        res.status(500).send(e);
-    }
+    res.send(req.user);
+
+    // try {
+    //     const users = await User.find({});
+    //     res.send(users);
+    // } catch (e) {
+    //     res.status(500).send(e);
+    // }
     // User.find({}).then((user) => {
     //     res.send(user)
     // }).catch((e) => {
