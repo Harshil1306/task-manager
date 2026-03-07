@@ -1,5 +1,6 @@
 const express = require('express');
 const router = new express.Router();
+const auth = require('../middleware/auth')
 
 const Task = require('../db/models/task');
 
@@ -86,14 +87,24 @@ router.delete('/tasks/:id', async (req, res) => {
     }
 })
 
-router.post('/tasks', async (req, res) => {
-    const task = new Task(req.body);
+router.post('/tasks', auth, async (req, res) => {
+    const task = new Task({
+        ...req.body,
+        owner: req.user._id
+    });
 
-    task.save().then(()=> {
-        res.status(201).send(task)
-    }).catch((e) => {
+    try {
+        await task.save();
+        res.status(200).send(task)
+    } catch (e) {
         res.status(400).send(e)
-    })
+    }
+
+    // task.save().then(()=> {
+    //     res.status(201).send(task)
+    // }).catch((e) => {
+    //     res.status(400).send(e)
+    // })
 })
 
 module.exports = router
