@@ -3,6 +3,7 @@ const multer = require('multer')
 const sharp = require('sharp')
 const router = new express.Router();
 const auth = require('../middleware/auth');
+const {sendWelcomeEmail, sendDeleteEmail } = require('../emails/account')
 
 const User = require('../db/models/user')
 
@@ -10,7 +11,8 @@ router.post('/users', async (req, res) => {
     const user = new User(req.body);
 
     try {
-        await user.save();
+        await user.save()
+        sendWelcomeEmail(user.email, user.name)
         const token = user.generateAuthToken()
         res.status(201).send({user, token})
     } catch (e) {
@@ -131,7 +133,8 @@ router.delete('/users/me', auth, async (req, res) => {
         //     return res.status(404).send();
         // }
         await req.user.deleteOne()
-        res.send(req.user);
+        sendDeleteEmail(req.user.email, req.user.name)
+        res.send(req.user)
     } catch (e) {
         res.status(400).send(e);
     }
